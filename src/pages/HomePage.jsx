@@ -2,8 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Package, Clock } from "lucide-react";
 import { GOLD_VINTAGE } from "../utils/constants";
 
-const BANNER_IMG =
-    "https://images.unsplash.com/photo-1547996160-81dfa63595dd?auto=format&fit=crop&q=80&w=2000";
+const BANNER_IMG = "/portada-hero.png";
 const ATELIER_IMG =
     "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&q=80&w=1200";
 
