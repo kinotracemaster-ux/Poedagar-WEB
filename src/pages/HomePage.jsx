@@ -23,16 +23,15 @@ export default function HomePage() {
                     <img src={BANNER_IMG} className="hero__img" alt="Poedagar Watches" />
                     <div className="hero__gradient" />
                 </div>
-                <div className="hero__content">
+                <div className="hero__content hero__content--bottom">
                     <span className="hero__subtitle animate-fade-up">
-                        Elegancia & Diseño Único
+                        Poedagar
                     </span>
-                    <h1 className="hero__title animate-fade-up delay-200">
-                        Relojes de lujo para quienes aprecian el valor del tiempo
+                    <h1 className="hero__title hero__title--compact animate-fade-up delay-200">
+                        Elegancia & Diseño Único
                     </h1>
                     <p className="hero__desc animate-fade-up delay-500">
-                        Cada reloj Poedagar es una declaración de estilo.
-                        Diseño exclusivo, materiales premium y atención al detalle.
+                        Relojes de lujo para quienes aprecian el valor del tiempo.
                     </p>
                     <button
                         onClick={() => navigate("/catalogo")}

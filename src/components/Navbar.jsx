@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Clock, Menu, X, ShoppingBag, Search } from "lucide-react";
-import { GOLD_VINTAGE } from "../utils/constants";
+import { Menu, X, ShoppingBag, Search } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
 const NAV_LINKS = [
@@ -16,6 +15,10 @@ export default function Navbar({ onOpenCart }) {
     const { cartCount } = useCart();
     const location = useLocation();
 
+    // Subpages have light background — navbar must always be dark there
+    const isHome = location.pathname === "/";
+    const needsDarkBg = !isHome || scrolled;
+
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener("scroll", handleScroll);
@@ -28,17 +31,18 @@ export default function Navbar({ onOpenCart }) {
 
     return (
         <nav
-            className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}
+            className={`navbar ${needsDarkBg ? "navbar--scrolled" : ""}`}
         >
             <div className="navbar__inner">
                 <div className="navbar__row">
-                    {/* Logo */}
+                    {/* Logo — imagen reemplaza el texto del nombre */}
                     <Link to="/" className="navbar__logo">
-                        <img src="/logo-poedagar.webp" alt="Poedagar" className="navbar__logo-icon" />
-                        <div className="navbar__logo-text">
-                            <span className="navbar__brand">Poedagar</span>
-                            <span className="navbar__tagline">Elegancia & Diseño Único</span>
-                        </div>
+                        <img
+                            src="/logo-poedagar.webp"
+                            alt="Poedagar"
+                            className="navbar__logo-img"
+                        />
+                        <span className="navbar__tagline">Elegancia & Diseño Único</span>
                     </Link>
 
                     {/* Desktop Links */}
