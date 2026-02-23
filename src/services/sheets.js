@@ -93,6 +93,7 @@ export function groupProducts(rows) {
                 price: parseFloat(row.price_suggested) || 0,
                 description: (row.description || "").trim(),
                 status: (row.status || "").trim(),
+                stock: row.stock !== undefined && row.stock !== "" ? parseInt(row.stock, 10) : -1,
                 mainImage: null,
                 extraPhotos: [],
                 videos: [],

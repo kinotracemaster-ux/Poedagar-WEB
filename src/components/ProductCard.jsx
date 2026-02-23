@@ -10,6 +10,8 @@ export default function ProductCard({ product, imageUrl }) {
     const [imgError, setImgError] = useState(false);
     const [currentUrl, setCurrentUrl] = useState(imageUrl);
 
+    const outOfStock = product.stock === 0;
+
     // Lazy load: if showing placeholder, fetch real image
     useEffect(() => {
         if (!imageUrl || imageUrl.includes("placehold.co")) {
@@ -28,6 +30,7 @@ export default function ProductCard({ product, imageUrl }) {
     const handleAdd = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (outOfStock) return;
         addToCart({
             sku: product.sku,
             name: product.name,
@@ -42,7 +45,7 @@ export default function ProductCard({ product, imageUrl }) {
     const variantCount = variants.length;
 
     return (
-        <Link to={`/producto/${encodeURIComponent(product.sku)}`} className="product-card">
+        <Link to={`/producto/${encodeURIComponent(product.sku)}`} className={`product-card ${outOfStock ? "product-card--sold-out" : ""}`}>
             <div className="product-card__image-wrapper">
                 {!imgError ? (
                     <img
@@ -59,6 +62,9 @@ export default function ProductCard({ product, imageUrl }) {
                     </div>
                 )}
                 <span className="product-card__sku-badge">{product.sku}</span>
+                {outOfStock && (
+                    <span className="product-card__sold-out-badge">Agotado</span>
+                )}
             </div>
             <div className="product-card__body">
                 <p className="product-card__sku">{product.sku}</p>
@@ -86,13 +92,17 @@ export default function ProductCard({ product, imageUrl }) {
 
                 <div className="product-card__footer">
                     <span className="product-card__price">
-                        {product.price > 0
-                            ? `$ ${product.price.toLocaleString()}`
-                            : "Consultar"}
+                        {outOfStock
+                            ? "Agotado"
+                            : product.price > 0
+                                ? `$ ${product.price.toLocaleString()}`
+                                : "Consultar"}
                     </span>
-                    <button onClick={handleAdd} className="product-card__add">
-                        Añadir <Plus size={12} />
-                    </button>
+                    {!outOfStock && (
+                        <button onClick={handleAdd} className="product-card__add">
+                            Añadir <Plus size={12} />
+                        </button>
+                    )}
                 </div>
             </div>
         </Link>

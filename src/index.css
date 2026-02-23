@@ -1086,6 +1086,45 @@ textarea:focus {
   letter-spacing: 0.1em;
 }
 
+/* Sold Out state */
+.product-card--sold-out .product-card__image-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+
+.product-card__sold-out-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  background: #c0392b;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  border-radius: 2px;
+}
+
+.product-card--sold-out .product-card__price {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+/* Disabled button */
+.btn--disabled {
+  background: #ccc;
+  color: #777;
+  cursor: not-allowed;
+  border: none;
+  opacity: 0.8;
+}
+
 .product-card__badge,
 .product-card__sku-badge {
   position: absolute;

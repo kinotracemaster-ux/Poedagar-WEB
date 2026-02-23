@@ -137,9 +137,11 @@ export default function ProductDetailPage({ products }) {
                     <p className="detail-info__sku">SKU: {product.sku}</p>
 
                     <div className="detail-info__price">
-                        {product.price > 0
-                            ? `$ ${product.price.toLocaleString()}`
-                            : "Consultar precio"}
+                        {product.stock === 0
+                            ? <span style={{ color: '#c0392b' }}>AGOTADO</span>
+                            : product.price > 0
+                                ? `$ ${product.price.toLocaleString()}`
+                                : "Consultar precio"}
                     </div>
 
                     <p className="detail-info__desc">{product.description}</p>
@@ -153,22 +155,36 @@ export default function ProductDetailPage({ products }) {
                             <span className="detail-info__meta-label">Movimiento</span>
                             <span>{product.movement}</span>
                         </div>
+                        {product.stock >= 0 && (
+                            <div className="detail-info__meta-item">
+                                <span className="detail-info__meta-label">Stock</span>
+                                <span>{product.stock === 0 ? "Sin stock" : `${product.stock} disponibles`}</span>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="detail-info__actions">
-                        <div className="qty-selector">
-                            <button onClick={() => setQty(Math.max(1, qty - 1))}>
-                                <Minus size={16} />
-                            </button>
-                            <span>{qty}</span>
-                            <button onClick={() => setQty(qty + 1)}>
-                                <Plus size={16} />
+                    {product.stock === 0 ? (
+                        <div className="detail-info__actions">
+                            <button className="btn btn--disabled btn--lg" disabled>
+                                Producto Agotado
                             </button>
                         </div>
-                        <button onClick={handleAddToCart} className="btn btn--primary btn--lg">
-                            <ShoppingBag size={18} /> Agregar al Carrito
-                        </button>
-                    </div>
+                    ) : (
+                        <div className="detail-info__actions">
+                            <div className="qty-selector">
+                                <button onClick={() => setQty(Math.max(1, qty - 1))}>
+                                    <Minus size={16} />
+                                </button>
+                                <span>{qty}</span>
+                                <button onClick={() => setQty(qty + 1)}>
+                                    <Plus size={16} />
+                                </button>
+                            </div>
+                            <button onClick={handleAddToCart} className="btn btn--primary btn--lg">
+                                <ShoppingBag size={18} /> Agregar al Carrito
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
