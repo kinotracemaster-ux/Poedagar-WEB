@@ -80,11 +80,23 @@ async function fetchCoversBatch(skus) {
 export async function loadFileMapping(products = []) {
     if (!products.length) return coverCache;
 
-    const skus = products.map((p) => p.mainImage || p.sku);
+    // Collect ALL image/video SKUs: mainImage + extraPhotos + videos
+    const skus = [];
+    for (const p of products) {
+        skus.push(p.mainImage || p.sku);
+        if (p.extraPhotos) {
+            for (const ep of p.extraPhotos) skus.push(ep.sku);
+        }
+        // Videos too (so thumbnails can be cached)
+        if (p.videos) {
+            for (const v of p.videos) skus.push(v.sku);
+        }
+    }
+
     // El visor solo busca en Drive max 10 SKUs no-cacheados por request
     const BATCH_SIZE = 10;
 
-    console.log(`[drive] Cargando portadas para ${skus.length} productos...`);
+    console.log(`[drive] Cargando portadas para ${skus.length} SKUs (${products.length} productos)...`);
 
     // Ronda 1: enviar todos los SKUs en lotes de 10
     for (let i = 0; i < skus.length; i += BATCH_SIZE) {
