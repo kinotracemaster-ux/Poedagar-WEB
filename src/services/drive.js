@@ -77,46 +77,29 @@ async function fetchCoversBatch(skus) {
  * Carga el mapeo de portadas para todos los productos.
  * Llama al visor en lotes de 20 SKUs para no sobrecargar.
  */
-export async function loadFileMapping(products = []) {
+export async function loadFileMapping(products = [], onProgress) {
     if (!products.length) return coverCache;
 
-    // Collect ALL image/video SKUs: mainImage + extraPhotos + videos
-    const skus = [];
+    // Prioritize: mainImage SKUs first, then extras and videos
+    const mainSkus = products.map((p) => p.mainImage || p.sku);
+    const extraSkus = [];
     for (const p of products) {
-        skus.push(p.mainImage || p.sku);
         if (p.extraPhotos) {
-            for (const ep of p.extraPhotos) skus.push(ep.sku);
+            for (const ep of p.extraPhotos) extraSkus.push(ep.sku);
         }
-        // Videos too (so thumbnails can be cached)
         if (p.videos) {
-            for (const v of p.videos) skus.push(v.sku);
+            for (const v of p.videos) extraSkus.push(v.sku);
         }
     }
 
-    // El visor solo busca en Drive max 10 SKUs no-cacheados por request
     const BATCH_SIZE = 10;
 
-    console.log(`[drive] Cargando portadas para ${skus.length} SKUs (${products.length} productos)...`);
+    console.log(`[drive] Cargando ${mainSkus.length} portadas principales + ${extraSkus.length} extras...`);
 
-    // Ronda 1: enviar todos los SKUs en lotes de 10
-    for (let i = 0; i < skus.length; i += BATCH_SIZE) {
-        const batch = skus.slice(i, i + BATCH_SIZE);
-        const covers = await fetchCoversBatch(batch);
-
-        for (const [sku, data] of Object.entries(covers)) {
-            if (data && data.url) {
-                coverCache[sku] = data.url;
-            }
-        }
-    }
-
-    // Ronda 2: reintentar los SKUs que no obtuvieron imagen
-    // (el visor ahora tiene los anteriores en caché, liberando slots)
-    const missing = skus.filter((s) => !coverCache[s]);
-    if (missing.length > 0) {
-        console.log(`[drive] Reintentando ${missing.length} SKUs sin portada...`);
-        for (let i = 0; i < missing.length; i += BATCH_SIZE) {
-            const batch = missing.slice(i, i + BATCH_SIZE);
+    // Helper: process a list of SKUs in batches
+    async function processBatches(skuList) {
+        for (let i = 0; i < skuList.length; i += BATCH_SIZE) {
+            const batch = skuList.slice(i, i + BATCH_SIZE);
             const covers = await fetchCoversBatch(batch);
 
             for (const [sku, data] of Object.entries(covers)) {
@@ -124,11 +107,30 @@ export async function loadFileMapping(products = []) {
                     coverCache[sku] = data.url;
                 }
             }
+
+            // Notify caller after each batch so UI can re-render
+            if (onProgress) onProgress({ ...coverCache });
         }
     }
 
+    // Ronda 1: portadas principales (lo que ve el catálogo)
+    await processBatches(mainSkus);
+
+    // Ronda 2: extras y videos (para detalle de producto)
+    if (extraSkus.length > 0) {
+        await processBatches(extraSkus);
+    }
+
+    // Ronda 3: reintentar los que fallaron
+    const allSkus = [...mainSkus, ...extraSkus];
+    const missing = allSkus.filter((s) => !coverCache[s]);
+    if (missing.length > 0) {
+        console.log(`[drive] Reintentando ${missing.length} SKUs sin portada...`);
+        await processBatches(missing);
+    }
+
     console.log(
-        `[drive] ${Object.keys(coverCache).length} portadas cargadas de ${skus.length} solicitadas`
+        `[drive] ${Object.keys(coverCache).length} portadas cargadas de ${allSkus.length} solicitadas`
     );
 
     return coverCache;

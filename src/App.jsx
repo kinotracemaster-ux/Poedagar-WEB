@@ -30,12 +30,15 @@ export default function App() {
         setProducts(merged);
         setLoading(false);
 
-        // 3. Cargar portadas desde el visor API (en background)
-        await loadFileMapping(merged).catch((err) =>
+        // 3. Cargar portadas desde el visor API (progresivo)
+        await loadFileMapping(merged, () => {
+          // Re-render después de cada lote para mostrar imágenes progresivamente
+          setProducts((prev) => [...prev]);
+        }).catch((err) =>
           console.warn("Error cargando portadas:", err)
         );
-        // Forzar re-render para que las imágenes se actualicen
-        setProducts([...merged]);
+        // Render final con todas las portadas
+        setProducts((prev) => [...prev]);
       } catch (err) {
         console.error("Error cargando datos:", err);
         setLoading(false);

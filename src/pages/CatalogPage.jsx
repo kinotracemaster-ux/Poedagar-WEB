@@ -72,6 +72,20 @@ export default function CatalogPage({ products, loading }) {
                 </div>
             </div>
 
+            {/* Category pills — siempre visibles */}
+            <div className="catalog-categories">
+                {CATEGORIES.map((cat) => (
+                    <button
+                        key={cat}
+                        onClick={() => setCategory(cat)}
+                        className={`pill ${category === cat ? "pill--active" : ""}`}
+                        style={category === cat ? { borderColor: GOLD_VINTAGE, color: GOLD_VINTAGE } : {}}
+                    >
+                        {cat}
+                    </button>
+                ))}
+            </div>
+
             {/* Search & Filters */}
             <div className="catalog-filters">
                 <div className="catalog-filters__search">
@@ -96,22 +110,6 @@ export default function CatalogPage({ products, loading }) {
 
             {/* Filter Bar */}
             <div className={`catalog-filters__bar ${showFilters ? "catalog-filters__bar--open" : ""}`}>
-                <div className="catalog-filters__group">
-                    <label>Categoría</label>
-                    <div className="catalog-filters__pills">
-                        {CATEGORIES.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setCategory(cat)}
-                                className={`pill ${category === cat ? "pill--active" : ""}`}
-                                style={category === cat ? { borderColor: GOLD_VINTAGE, color: GOLD_VINTAGE } : {}}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
                 <div className="catalog-filters__group">
                     <label>Género</label>
                     <div className="catalog-filters__pills">

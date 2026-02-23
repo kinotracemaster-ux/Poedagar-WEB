@@ -1191,6 +1191,15 @@ textarea:focus {
   margin-bottom: 2rem;
 }
 
+.catalog-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
 .catalog-page__count {
   font-size: 0.75rem;
   color: var(--text-muted);
