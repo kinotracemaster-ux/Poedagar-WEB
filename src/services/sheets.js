@@ -100,19 +100,20 @@ function parsePrice(val) {
 
 export function groupProducts(rows) {
     const seen = new Set();
-    const productMap = new Map();
+    // First pass: group by baseSku (handles F1/V1 suffixes)
+    const variantMap = new Map();
 
     for (const row of rows) {
         const sku = (row.sku || "").trim();
-        if (!sku || seen.has(sku)) continue; // deduplica
+        if (!sku || seen.has(sku)) continue;
         seen.add(sku);
 
         if ((row.status || "").trim().toLowerCase() !== "active") continue;
 
         const { baseSku, type, index } = parseSkuSuffix(sku);
 
-        if (!productMap.has(baseSku)) {
-            productMap.set(baseSku, {
+        if (!variantMap.has(baseSku)) {
+            variantMap.set(baseSku, {
                 sku: baseSku,
                 name: (row.name || "").trim(),
                 category: (row.category || "").trim(),
@@ -128,26 +129,72 @@ export function groupProducts(rows) {
             });
         }
 
-        const product = productMap.get(baseSku);
+        const variant = variantMap.get(baseSku);
 
         if (type === "main") {
-            product.mainImage = sku;
+            variant.mainImage = sku;
         } else if (type === "photo") {
-            product.extraPhotos.push({ sku, index });
+            variant.extraPhotos.push({ sku, index });
         } else if (type === "video") {
-            product.videos.push({ sku, index });
+            variant.videos.push({ sku, index });
         }
     }
 
-    // Si un producto no tiene mainImage, usar su baseSku
-    for (const p of productMap.values()) {
-        if (!p.mainImage) p.mainImage = p.sku;
-        // Ordenar fotos extras por index
-        p.extraPhotos.sort((a, b) => a.index - b.index);
-        p.videos.sort((a, b) => a.index - b.index);
+    // Set defaults for variants
+    for (const v of variantMap.values()) {
+        if (!v.mainImage) v.mainImage = v.sku;
+        v.extraPhotos.sort((a, b) => a.index - b.index);
+        v.videos.sort((a, b) => a.index - b.index);
     }
 
-    return Array.from(productMap.values());
+    // Second pass: group variants under parent SKU
+    // "993-1" → parent "993", "938-2" → parent "938"
+    const parentMap = new Map();
+
+    for (const variant of variantMap.values()) {
+        const parentSku = variant.sku.replace(/-\d+$/, "");
+
+        if (!parentMap.has(parentSku)) {
+            parentMap.set(parentSku, {
+                sku: parentSku,
+                name: variant.name,
+                category: variant.category,
+                gender: variant.gender,
+                movement: variant.movement,
+                price: variant.price,
+                description: variant.description,
+                status: variant.status,
+                stock: variant.stock,
+                mainImage: variant.mainImage,
+                extraPhotos: [...variant.extraPhotos],
+                videos: [...variant.videos],
+            });
+        } else {
+            const parent = parentMap.get(parentSku);
+            // Add this variant's mainImage as an extra photo thumbnail
+            parent.extraPhotos.push({
+                sku: variant.mainImage || variant.sku,
+                index: parent.extraPhotos.length + 100,
+            });
+            // Merge additional photos and videos
+            for (const ep of variant.extraPhotos) {
+                parent.extraPhotos.push({ ...ep, index: parent.extraPhotos.length + 100 });
+            }
+            for (const vid of variant.videos) {
+                parent.videos.push({ ...vid, index: parent.videos.length + 100 });
+            }
+            // Use higher stock if available
+            if (variant.stock > 0 && (parent.stock <= 0 || parent.stock === -1)) {
+                parent.stock = variant.stock;
+            }
+            // Use price if parent doesn't have one
+            if (!parent.price && variant.price) {
+                parent.price = variant.price;
+            }
+        }
+    }
+
+    return Array.from(parentMap.values());
 }
 
 /**
