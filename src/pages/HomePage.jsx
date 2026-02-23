@@ -8,9 +8,9 @@ const ATELIER_IMG =
     "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&q=80&w=1200";
 
 const FEATURES = [
-    { icon: ShieldCheck, title: "Seguridad", desc: "Certificado de origen" },
-    { icon: Package, title: "Logística", desc: "Envío prioritario" },
-    { icon: Clock, title: "Soporte", desc: "Asistencia Atelier" },
+    { icon: ShieldCheck, title: "Calidad", desc: "Diseño único y resistente" },
+    { icon: Package, title: "Envío", desc: "Entrega segura a tu puerta" },
+    { icon: Clock, title: "Elegancia", desc: "Estilo que perdura" },
 ];
 
 export default function HomePage() {
@@ -26,20 +26,20 @@ export default function HomePage() {
                 </div>
                 <div className="hero__content">
                     <span className="hero__subtitle animate-fade-up">
-                        Manufactura Europea - Est. 1998
+                        Elegancia & Diseño Único
                     </span>
                     <h1 className="hero__title animate-fade-up delay-200">
-                        Poedagar Watches
+                        Relojes de lujo para quienes aprecian el valor del tiempo
                     </h1>
                     <p className="hero__desc animate-fade-up delay-500">
-                        "El tiempo es el único lujo que no se puede fabricar, pero sí se
-                        puede vestir con elegancia."
+                        Cada reloj Poedagar es una declaración de estilo.
+                        Diseño exclusivo, materiales premium y atención al detalle.
                     </p>
                     <button
                         onClick={() => navigate("/catalogo")}
                         className="btn btn--hero"
                     >
-                        Explorar Colecciones
+                        Ver Colección
                     </button>
                 </div>
             </section>
@@ -48,7 +48,7 @@ export default function HomePage() {
             <section className="atelier">
                 <div className="atelier__grid">
                     <div className="atelier__image-wrapper">
-                        <img src={ATELIER_IMG} className="atelier__image" alt="Atelier" />
+                        <img src={ATELIER_IMG} className="atelier__image" alt="Poedagar" />
                         <div className="atelier__frame" style={{ borderColor: `${GOLD_VINTAGE}33` }} />
                     </div>
                     <div className="atelier__info">
@@ -56,24 +56,24 @@ export default function HomePage() {
                             className="atelier__label"
                             style={{ color: GOLD_VINTAGE }}
                         >
-                            L'Atelier
+                            Nuestra Esencia
                         </h2>
                         <h3 className="atelier__heading">
-                            Artesanía Europea con Alma Moderna
+                            Elegancia en cada detalle
                         </h3>
                         <p className="atelier__text">
-                            Cada pieza de nuestra colección es seleccionada bajo estándares de
-                            calidad ginebrinos. No solo vendemos un instrumento para medir el
-                            tiempo, sino una joya que cuenta su historia.
+                            Cada pieza de nuestra colección refleja un compromiso con el diseño
+                            y la calidad. No solo ofrecemos relojes, sino una experiencia de
+                            estilo que habla por sí misma.
                         </p>
                         <div className="atelier__stats">
                             <div>
-                                <span className="atelier__stat-number">27</span>
-                                <p className="atelier__stat-label">Años de Tradición</p>
+                                <span className="atelier__stat-number">+50</span>
+                                <p className="atelier__stat-label">Modelos Exclusivos</p>
                             </div>
                             <div>
                                 <span className="atelier__stat-number">100%</span>
-                                <p className="atelier__stat-label">Garantía Atelier</p>
+                                <p className="atelier__stat-label">Garantía de Calidad</p>
                             </div>
                         </div>
                     </div>

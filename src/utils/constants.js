@@ -4,10 +4,10 @@ export const WHATSAPP_NUMBER = "5491122334455";
 // Marca a filtrar (solo mostrar esta marca del Sheet y Drive)
 export const BRAND_FILTER = "POEDAGAR";
 
-// Colores
-export const GOLD_VINTAGE = "#C5A059";
-export const BG_CREAM = "#FDFBF7";
-export const BG_DARK = "#0a0a0a";
+// Colores — paleta café oscuro / cuero
+export const GOLD_VINTAGE = "#8B6914";
+export const BG_CREAM = "#FAF6F1";
+export const BG_DARK = "#1a1209";
 
 // Google Sheets (publicado como CSV)
 export const SHEETS_CSV_URL =

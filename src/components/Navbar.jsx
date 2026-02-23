@@ -34,10 +34,10 @@ export default function Navbar({ onOpenCart }) {
                 <div className="navbar__row">
                     {/* Logo */}
                     <Link to="/" className="navbar__logo">
-                        <Clock className="navbar__logo-icon" style={{ color: GOLD_VINTAGE }} />
+                        <img src="/logo-poedagar.webp" alt="Poedagar" className="navbar__logo-icon" />
                         <div className="navbar__logo-text">
                             <span className="navbar__brand">Poedagar</span>
-                            <span className="navbar__tagline">Atelier de Luxe</span>
+                            <span className="navbar__tagline">Elegancia & Diseño Único</span>
                         </div>
                     </Link>
 
