@@ -11,6 +11,7 @@ import HomePage from "./pages/HomePage";
 import CatalogPage from "./pages/CatalogPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import AdminPage from "./pages/AdminPage";
+import AdminGate from "./components/AdminGate";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 
@@ -63,7 +64,7 @@ export default function App() {
           />
 
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage products={products} />} />
             <Route
               path="/catalogo"
               element={
@@ -75,9 +76,11 @@ export default function App() {
               element={<ProductDetailPage products={products} />}
             />
             <Route
-              path="/admin"
+              path="/panel-admin"
               element={
-                <AdminPage products={products} setProducts={setProducts} />
+                <AdminGate>
+                  <AdminPage products={products} setProducts={setProducts} />
+                </AdminGate>
               }
             />
             <Route path="/checkout" element={<CheckoutPage />} />

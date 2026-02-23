@@ -6,7 +6,6 @@ import { useCart } from "../context/CartContext";
 const NAV_LINKS = [
     { to: "/", label: "Inicio" },
     { to: "/catalogo", label: "Colecciones" },
-    { to: "/admin", label: "Atelier" },
 ];
 
 export default function Navbar({ onOpenCart }) {

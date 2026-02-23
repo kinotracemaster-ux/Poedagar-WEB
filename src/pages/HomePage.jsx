@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Package, Clock } from "lucide-react";
-import { GOLD_VINTAGE } from "../utils/constants";
+import { useNavigate, Link } from "react-router-dom";
+import { ShieldCheck, Package, Clock, ArrowRight } from "lucide-react";
+import { GOLD_VINTAGE, CATEGORIES } from "../utils/constants";
+import ProductCard from "../components/ProductCard";
+import { getProductImageUrl } from "../services/drive";
 
 const BANNER_IMG = "/portada-hero.png";
-const ATELIER_IMG =
-    "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&q=80&w=1200";
 
 const FEATURES = [
     { icon: ShieldCheck, title: "Calidad", desc: "Diseño único y resistente" },
@@ -12,8 +12,43 @@ const FEATURES = [
     { icon: Clock, title: "Elegancia", desc: "Estilo que perdura" },
 ];
 
-export default function HomePage() {
+// Category display info (without "Todos")
+const CATEGORY_META = {
+    CLASICO: {
+        title: "Clásico",
+        desc: "Elegancia atemporal para quienes valoran la tradición.",
+    },
+    DEPORTIVO: {
+        title: "Deportivo",
+        desc: "Resistencia y estilo para un ritmo de vida activo.",
+    },
+    "LUZ LED": {
+        title: "Luz LED",
+        desc: "Innovación y diseño futurista en cada muñeca.",
+    },
+    "PARED 3D": {
+        title: "Pared 3D",
+        desc: "Relojes de pared con diseño tridimensional único.",
+    },
+};
+
+export default function HomePage({ products = [] }) {
     const navigate = useNavigate();
+
+    // 20 últimas referencias
+    const latestProducts = products.slice(0, 20);
+
+    // Products grouped by category (for the sections below)
+    const categoriesWithProducts = CATEGORIES
+        .filter((c) => c !== "Todos")
+        .map((cat) => ({
+            key: cat,
+            meta: CATEGORY_META[cat] || { title: cat, desc: "" },
+            items: products.filter(
+                (p) => p.category.toUpperCase() === cat.toUpperCase()
+            ),
+        }))
+        .filter((c) => c.items.length > 0);
 
     return (
         <main>
@@ -42,39 +77,75 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Atelier */}
-            <section className="atelier">
-                <div className="atelier__grid">
-                    <div className="atelier__image-wrapper">
-                        <img src={ATELIER_IMG} className="atelier__image" alt="Poedagar" />
-                        <div className="atelier__frame" style={{ borderColor: `${GOLD_VINTAGE}33` }} />
-                    </div>
-                    <div className="atelier__info">
-                        <h2
-                            className="atelier__label"
-                            style={{ color: GOLD_VINTAGE }}
-                        >
-                            Nuestra Esencia
-                        </h2>
-                        <h3 className="atelier__heading">
-                            Elegancia en cada detalle
-                        </h3>
-                        <p className="atelier__text">
-                            Cada pieza de nuestra colección refleja un compromiso con el diseño
-                            y la calidad. No solo ofrecemos relojes, sino una experiencia de
-                            estilo que habla por sí misma.
+            {/* Pre-catálogo — Últimas Referencias */}
+            {latestProducts.length > 0 && (
+                <section className="home-catalog">
+                    <div className="home-catalog__header">
+                        <span className="label-gold" style={{ color: GOLD_VINTAGE }}>
+                            Novedades
+                        </span>
+                        <h2 className="page-title">Últimas Referencias</h2>
+                        <p className="page-subtitle">
+                            Descubre las piezas más recientes de nuestra colección.
                         </p>
-                        <div className="atelier__stats">
-                            <div>
-                                <span className="atelier__stat-number">+50</span>
-                                <p className="atelier__stat-label">Modelos Exclusivos</p>
+                    </div>
+                    <div className="product-grid">
+                        {latestProducts.map((p) => (
+                            <ProductCard
+                                key={p.sku}
+                                product={p}
+                                imageUrl={getProductImageUrl(p.mainImage)}
+                            />
+                        ))}
+                    </div>
+                    <div className="home-catalog__cta">
+                        <Link to="/catalogo" className="btn btn--outline">
+                            Ver Todo el Catálogo <ArrowRight size={16} />
+                        </Link>
+                    </div>
+                </section>
+            )}
+
+            {/* Colecciones por Categoría */}
+            <section className="home-collections">
+                <div className="home-collections__header">
+                    <span className="label-gold" style={{ color: GOLD_VINTAGE }}>
+                        Nuestras Colecciones
+                    </span>
+                    <h2 className="page-title">Colecciones</h2>
+                    <p className="page-subtitle">
+                        Explora nuestras líneas diseñadas para cada estilo de vida.
+                    </p>
+                </div>
+                <div className="home-collections__list">
+                    {categoriesWithProducts.map((cat) => (
+                        <div key={cat.key} className="home-collection-block">
+                            <div className="home-collection-block__header">
+                                <h3 className="home-collection-block__title">
+                                    {cat.meta.title}
+                                </h3>
+                                <p className="home-collection-block__desc">
+                                    {cat.meta.desc}
+                                </p>
+                                <Link
+                                    to={`/catalogo?cat=${encodeURIComponent(cat.key)}`}
+                                    className="home-collection-block__link"
+                                    style={{ color: GOLD_VINTAGE }}
+                                >
+                                    Ver todos <ArrowRight size={14} />
+                                </Link>
                             </div>
-                            <div>
-                                <span className="atelier__stat-number">100%</span>
-                                <p className="atelier__stat-label">Garantía de Calidad</p>
+                            <div className="product-grid product-grid--sm">
+                                {cat.items.slice(0, 4).map((p) => (
+                                    <ProductCard
+                                        key={p.sku}
+                                        product={p}
+                                        imageUrl={getProductImageUrl(p.mainImage)}
+                                    />
+                                ))}
                             </div>
                         </div>
-                    </div>
+                    ))}
                 </div>
             </section>
 

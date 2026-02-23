@@ -37,14 +37,6 @@ export default function ProductCard({ product, imageUrl }) {
                         <span>{product.sku}</span>
                     </div>
                 )}
-                {product.category && (
-                    <span
-                        className="product-card__badge"
-                        style={{ backgroundColor: GOLD_VINTAGE }}
-                    >
-                        {product.category}
-                    </span>
-                )}
             </div>
             <div className="product-card__body">
                 <span
