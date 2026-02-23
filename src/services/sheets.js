@@ -71,20 +71,29 @@ export function extractModel(baseSku) {
  * - Variantes (993-1, 993-2, etc.) cada una con sus fotos extras y videos
  */
 /**
- * Parsea un precio que puede venir como "$120.000", "120000", etc.
+ * Parsea un precio que puede venir como " $120.000", "120000", "$120,000", etc.
  */
 function parsePrice(val) {
     if (!val) return 0;
-    let s = String(val).replace(/[$\s]/g, "");
+    // Strip everything except digits, dots, and commas
+    let s = String(val).replace(/[^0-9.,]/g, "");
+    if (!s) return 0;
     if (s.includes(".") && s.includes(",")) {
+        // "120.000,50" → 120000.50
         s = s.replace(/\./g, "").replace(",", ".");
     } else if (s.includes(".")) {
         const parts = s.split(".");
-        if (parts[parts.length - 1].length === 3) {
+        // If last group has 3 digits → thousands separator (e.g. "120.000")
+        if (parts[parts.length - 1].length === 3 && parts.length > 1) {
             s = s.replace(/\./g, "");
         }
     } else if (s.includes(",")) {
-        s = s.replace(",", ".");
+        const parts = s.split(",");
+        if (parts[parts.length - 1].length === 3 && parts.length > 1) {
+            s = s.replace(/,/g, "");
+        } else {
+            s = s.replace(",", ".");
+        }
     }
     return parseFloat(s) || 0;
 }
