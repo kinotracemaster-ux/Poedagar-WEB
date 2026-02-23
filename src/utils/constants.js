@@ -16,6 +16,9 @@ export const SHEETS_CSV_URL =
 // Google Drive folder ID
 export const DRIVE_FOLDER_ID = "1fYy8YwK4Vt_mVS0zjZtJIjlyvJiZXV4m";
 
+// Visor API (proxy para acceder a imágenes de Google Drive)
+export const VISOR_API_URL = "https://viewfinder-kino-visor.up.railway.app";
+
 // Categorías del negocio
 export const CATEGORIES = [
   "Todos",

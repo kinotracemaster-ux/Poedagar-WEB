@@ -22,17 +22,21 @@ export default function App() {
   useEffect(() => {
     async function init() {
       try {
-        // Cargar datos en paralelo
-        const [prods] = await Promise.all([
-          loadProducts(),
-          loadFileMapping().catch(() => ({})),
-        ]);
-        // Aplicar overrides del admin (precios, etc.)
+        // 1. Cargar productos del Google Sheet
+        const prods = await loadProducts();
+        // 2. Aplicar overrides del admin (precios, etc.)
         const merged = applyOverrides(prods);
         setProducts(merged);
+        setLoading(false);
+
+        // 3. Cargar portadas desde el visor API (en background)
+        await loadFileMapping(merged).catch((err) =>
+          console.warn("Error cargando portadas:", err)
+        );
+        // Forzar re-render para que las imágenes se actualicen
+        setProducts([...merged]);
       } catch (err) {
         console.error("Error cargando datos:", err);
-      } finally {
         setLoading(false);
       }
     }
