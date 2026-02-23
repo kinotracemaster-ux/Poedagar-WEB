@@ -159,7 +159,7 @@ export default function CatalogPage({ products, loading }) {
             {loading && (
                 <div className="catalog-page__loading">
                     <div className="spinner" />
-                    <p>Cargando catálogo desde Google Sheets...</p>
+                    <p>Cargando catálogo...</p>
                 </div>
             )}
 
