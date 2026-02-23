@@ -2,12 +2,28 @@ import { Link } from "react-router-dom";
 import { Plus, ImageOff } from "lucide-react";
 import { GOLD_VINTAGE } from "../utils/constants";
 import { useCart } from "../context/CartContext";
-import { useState } from "react";
-import { getProductImageUrl } from "../services/drive";
+import { useState, useEffect } from "react";
+import { getProductImageUrl, loadCoverForSku } from "../services/drive";
 
 export default function ProductCard({ product, imageUrl }) {
     const { addToCart } = useCart();
     const [imgError, setImgError] = useState(false);
+    const [currentUrl, setCurrentUrl] = useState(imageUrl);
+
+    // Lazy load: if showing placeholder, fetch real image
+    useEffect(() => {
+        if (!imageUrl || imageUrl.includes("placehold.co")) {
+            const sku = product.mainImage || product.sku;
+            loadCoverForSku(sku).then((url) => {
+                if (url && !url.includes("placehold.co")) {
+                    setCurrentUrl(url);
+                    setImgError(false);
+                }
+            });
+        } else {
+            setCurrentUrl(imageUrl);
+        }
+    }, [imageUrl, product.mainImage, product.sku]);
 
     const handleAdd = (e) => {
         e.preventDefault();
@@ -16,7 +32,7 @@ export default function ProductCard({ product, imageUrl }) {
             sku: product.sku,
             name: product.name,
             price: product.price,
-            image: imageUrl,
+            image: currentUrl,
             category: product.category,
         });
     };
@@ -30,7 +46,7 @@ export default function ProductCard({ product, imageUrl }) {
             <div className="product-card__image-wrapper">
                 {!imgError ? (
                     <img
-                        src={imageUrl}
+                        src={currentUrl}
                         alt={product.name}
                         className="product-card__image"
                         loading="lazy"
@@ -85,8 +101,20 @@ export default function ProductCard({ product, imageUrl }) {
 
 function VariantThumb({ sku }) {
     const [err, setErr] = useState(false);
-    const url = getProductImageUrl(sku);
-    const isPlaceholder = url.startsWith("data:");
+    const [url, setUrl] = useState(() => getProductImageUrl(sku));
+
+    useEffect(() => {
+        if (url.includes("placehold.co")) {
+            loadCoverForSku(sku).then((newUrl) => {
+                if (newUrl && !newUrl.includes("placehold.co")) {
+                    setUrl(newUrl);
+                    setErr(false);
+                }
+            });
+        }
+    }, [sku, url]);
+
+    const isPlaceholder = url.includes("placehold.co");
 
     if (isPlaceholder || err) {
         return (
