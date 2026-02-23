@@ -81,11 +81,12 @@ export async function loadFileMapping(products = []) {
     if (!products.length) return coverCache;
 
     const skus = products.map((p) => p.mainImage || p.sku);
-    const BATCH_SIZE = 20;
+    // El visor solo busca en Drive max 10 SKUs no-cacheados por request
+    const BATCH_SIZE = 10;
 
     console.log(`[drive] Cargando portadas para ${skus.length} productos...`);
 
-    // Dividir en lotes
+    // Ronda 1: enviar todos los SKUs en lotes de 10
     for (let i = 0; i < skus.length; i += BATCH_SIZE) {
         const batch = skus.slice(i, i + BATCH_SIZE);
         const covers = await fetchCoversBatch(batch);
@@ -93,6 +94,23 @@ export async function loadFileMapping(products = []) {
         for (const [sku, data] of Object.entries(covers)) {
             if (data && data.url) {
                 coverCache[sku] = data.url;
+            }
+        }
+    }
+
+    // Ronda 2: reintentar los SKUs que no obtuvieron imagen
+    // (el visor ahora tiene los anteriores en caché, liberando slots)
+    const missing = skus.filter((s) => !coverCache[s]);
+    if (missing.length > 0) {
+        console.log(`[drive] Reintentando ${missing.length} SKUs sin portada...`);
+        for (let i = 0; i < missing.length; i += BATCH_SIZE) {
+            const batch = missing.slice(i, i + BATCH_SIZE);
+            const covers = await fetchCoversBatch(batch);
+
+            for (const [sku, data] of Object.entries(covers)) {
+                if (data && data.url) {
+                    coverCache[sku] = data.url;
+                }
             }
         }
     }
