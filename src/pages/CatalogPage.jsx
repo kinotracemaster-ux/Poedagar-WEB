@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { GOLD_VINTAGE, CATEGORIES, GENDERS } from "../utils/constants";
+import { GOLD_VINTAGE, GENDERS } from "../utils/constants";
 import ProductCard from "../components/ProductCard";
 import { getProductImageUrl } from "../services/drive";
 
@@ -10,6 +10,15 @@ export default function CatalogPage({ products, loading }) {
     const [gender, setGender] = useState("Todos");
     const [sortBy, setSortBy] = useState("name");
     const [showFilters, setShowFilters] = useState(false);
+
+    // Dynamic categories from actual product data
+    const categories = useMemo(() => {
+        const cats = new Set();
+        for (const p of products) {
+            if (p.category) cats.add(p.category.toUpperCase());
+        }
+        return ["Todos", ...Array.from(cats).sort()];
+    }, [products]);
 
     const filtered = useMemo(() => {
         let result = [...products];
@@ -74,7 +83,7 @@ export default function CatalogPage({ products, loading }) {
 
             {/* Category pills — siempre visibles */}
             <div className="catalog-categories">
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                     <button
                         key={cat}
                         onClick={() => setCategory(cat)}

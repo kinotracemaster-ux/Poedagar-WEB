@@ -1,8 +1,9 @@
 import { useNavigate, Link } from "react-router-dom";
 import { ShieldCheck, Package, Clock, ArrowRight } from "lucide-react";
-import { GOLD_VINTAGE, CATEGORIES } from "../utils/constants";
+import { GOLD_VINTAGE } from "../utils/constants";
 import ProductCard from "../components/ProductCard";
 import { getProductImageUrl } from "../services/drive";
+import { useMemo } from "react";
 
 const BANNER_IMG = "/portada-hero.png";
 
@@ -12,24 +13,10 @@ const FEATURES = [
     { icon: Clock, title: "Elegancia", desc: "Estilo que perdura" },
 ];
 
-// Category display info (without "Todos")
-const CATEGORY_META = {
-    CLASICO: {
-        title: "Clásico",
-        desc: "Elegancia atemporal para quienes valoran la tradición.",
-    },
-    DEPORTIVO: {
-        title: "Deportivo",
-        desc: "Resistencia y estilo para un ritmo de vida activo.",
-    },
-    "LUZ LED": {
-        title: "Luz LED",
-        desc: "Innovación y diseño futurista en cada muñeca.",
-    },
-    "PARED 3D": {
-        title: "Pared 3D",
-        desc: "Relojes de pared con diseño tridimensional único.",
-    },
+// Category display info
+const CATEGORY_DESC = {
+    CLASICO: "Elegancia atemporal para quienes valoran la tradición.",
+    DEPORTIVO: "Resistencia y estilo para un ritmo de vida activo.",
 };
 
 export default function HomePage({ products = [] }) {
@@ -38,17 +25,24 @@ export default function HomePage({ products = [] }) {
     // 20 últimas referencias
     const latestProducts = products.slice(0, 20);
 
-    // Products grouped by category (for the sections below)
-    const categoriesWithProducts = CATEGORIES
-        .filter((c) => c !== "Todos")
-        .map((cat) => ({
-            key: cat,
-            meta: CATEGORY_META[cat] || { title: cat, desc: "" },
-            items: products.filter(
-                (p) => p.category.toUpperCase() === cat.toUpperCase()
-            ),
-        }))
-        .filter((c) => c.items.length > 0);
+    // Products grouped by category — only categories that actually exist
+    const categoriesWithProducts = useMemo(() => {
+        const catMap = new Map();
+        for (const p of products) {
+            const key = (p.category || "").toUpperCase();
+            if (!key) continue;
+            if (!catMap.has(key)) catMap.set(key, []);
+            catMap.get(key).push(p);
+        }
+        return Array.from(catMap.entries())
+            .map(([key, items]) => ({
+                key,
+                title: key.charAt(0) + key.slice(1).toLowerCase(),
+                desc: CATEGORY_DESC[key] || "",
+                items,
+            }))
+            .sort((a, b) => a.key.localeCompare(b.key));
+    }, [products]);
 
     return (
         <main>
@@ -107,47 +101,51 @@ export default function HomePage({ products = [] }) {
             )}
 
             {/* Colecciones por Categoría */}
-            <section className="home-collections">
-                <div className="home-collections__header">
-                    <span className="label-gold" style={{ color: GOLD_VINTAGE }}>
-                        Nuestras Colecciones
-                    </span>
-                    <h2 className="page-title">Colecciones</h2>
-                    <p className="page-subtitle">
-                        Explora nuestras líneas diseñadas para cada estilo de vida.
-                    </p>
-                </div>
-                <div className="home-collections__list">
-                    {categoriesWithProducts.map((cat) => (
-                        <div key={cat.key} className="home-collection-block">
-                            <div className="home-collection-block__header">
-                                <h3 className="home-collection-block__title">
-                                    {cat.meta.title}
-                                </h3>
-                                <p className="home-collection-block__desc">
-                                    {cat.meta.desc}
-                                </p>
-                                <Link
-                                    to={`/catalogo?cat=${encodeURIComponent(cat.key)}`}
-                                    className="home-collection-block__link"
-                                    style={{ color: GOLD_VINTAGE }}
-                                >
-                                    Ver todos <ArrowRight size={14} />
-                                </Link>
+            {categoriesWithProducts.length > 0 && (
+                <section className="home-collections">
+                    <div className="home-collections__header">
+                        <span className="label-gold" style={{ color: GOLD_VINTAGE }}>
+                            Nuestras Colecciones
+                        </span>
+                        <h2 className="page-title">Colecciones</h2>
+                        <p className="page-subtitle">
+                            Explora nuestras líneas diseñadas para cada estilo de vida.
+                        </p>
+                    </div>
+                    <div className="home-collections__list">
+                        {categoriesWithProducts.map((cat) => (
+                            <div key={cat.key} className="home-collection-block">
+                                <div className="home-collection-block__header">
+                                    <h3 className="home-collection-block__title">
+                                        {cat.title}
+                                    </h3>
+                                    {cat.desc && (
+                                        <p className="home-collection-block__desc">
+                                            {cat.desc}
+                                        </p>
+                                    )}
+                                    <Link
+                                        to={`/catalogo?cat=${encodeURIComponent(cat.key)}`}
+                                        className="home-collection-block__link"
+                                        style={{ color: GOLD_VINTAGE }}
+                                    >
+                                        Ver todos <ArrowRight size={14} />
+                                    </Link>
+                                </div>
+                                <div className="product-grid product-grid--sm">
+                                    {cat.items.slice(0, 4).map((p) => (
+                                        <ProductCard
+                                            key={p.sku}
+                                            product={p}
+                                            imageUrl={getProductImageUrl(p.mainImage)}
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                            <div className="product-grid product-grid--sm">
-                                {cat.items.slice(0, 4).map((p) => (
-                                    <ProductCard
-                                        key={p.sku}
-                                        product={p}
-                                        imageUrl={getProductImageUrl(p.mainImage)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Features */}
             <section className="features-bar">
