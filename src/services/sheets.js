@@ -70,6 +70,25 @@ export function extractModel(baseSku) {
  * - Datos principales (name, category, gender, etc.)
  * - Variantes (993-1, 993-2, etc.) cada una con sus fotos extras y videos
  */
+/**
+ * Parsea un precio que puede venir como "$120.000", "120000", etc.
+ */
+function parsePrice(val) {
+    if (!val) return 0;
+    let s = String(val).replace(/[$\s]/g, "");
+    if (s.includes(".") && s.includes(",")) {
+        s = s.replace(/\./g, "").replace(",", ".");
+    } else if (s.includes(".")) {
+        const parts = s.split(".");
+        if (parts[parts.length - 1].length === 3) {
+            s = s.replace(/\./g, "");
+        }
+    } else if (s.includes(",")) {
+        s = s.replace(",", ".");
+    }
+    return parseFloat(s) || 0;
+}
+
 export function groupProducts(rows) {
     const seen = new Set();
     const productMap = new Map();
@@ -90,7 +109,7 @@ export function groupProducts(rows) {
                 category: (row.category || "").trim(),
                 gender: (row.gender || "").trim().toLowerCase(),
                 movement: (row.movement || "").trim(),
-                price: parseFloat(row.price_suggested) || 0,
+                price: parsePrice(row.price || row.price_suggested),
                 description: (row.description || "").trim(),
                 status: (row.status || "").trim(),
                 stock: row.stock !== undefined && row.stock !== "" ? parseInt(row.stock, 10) : -1,
