@@ -4,6 +4,7 @@ import { GOLD_VINTAGE } from "../utils/constants";
 import ProductCard from "../components/ProductCard";
 import { getProductImageUrl } from "../services/drive";
 import { useMemo } from "react";
+import InstagramCarousel from "../components/InstagramCarousel";
 
 const BANNER_IMG = "/portada-hero.png";
 
@@ -146,6 +147,8 @@ export default function HomePage({ products = [] }) {
                     </div>
                 </section>
             )}
+
+            <InstagramCarousel />
 
             {/* Features */}
             <section className="features-bar">

@@ -2493,3 +2493,160 @@ textarea:focus {
     font-size: 1.2rem;
   }
 }
+
+/* ============================================= */
+/* INSTAGRAM CAROUSEL */
+/* ============================================= */
+.insta-carousel {
+  padding: 5rem 0;
+  background: var(--cream);
+  overflow: hidden;
+}
+
+.insta-carousel__header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 1.5rem;
+}
+
+.insta-carousel__track {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.insta-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.insta-item {
+  position: relative;
+  /* Responsive: Muestra "un video a la vez" en móvil ocupando 85vw */
+  flex: 0 0 85vw;
+  max-height: 65vh; /* Evita que sea más alto que la pantalla del celular */
+  aspect-ratio: 9/16;
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  scroll-snap-align: center;
+  background: var(--dark);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease;
+}
+
+.insta-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 640px) {
+  .insta-item {
+    flex: 0 0 calc(33.333% - 0.66rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .insta-item {
+    flex: 0 0 calc(16.666% - 0.83rem);
+  }
+}
+
+.insta-item__thumb,
+.insta-item__video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.4s ease;
+}
+
+.insta-item__video {
+  opacity: 0;
+}
+
+.insta-item__video--visible {
+  opacity: 1;
+}
+
+.insta-item__thumb--hidden {
+  opacity: 0;
+}
+
+.insta-item__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.insta-item:hover .insta-item__overlay {
+  opacity: 1;
+}
+
+.insta-item__icon {
+  color: var(--white);
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+}
+
+.insta-item:hover .insta-item__icon {
+  transform: scale(1);
+}
+
+.insta-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  animation: fadeUp 0.3s ease-out forwards;
+}
+
+.insta-modal__close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--white);
+  opacity: 0.7;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.insta-modal__close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.insta-modal__content {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  aspect-ratio: 9/16;
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.insta-modal__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
